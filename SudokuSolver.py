@@ -91,24 +91,22 @@ Infrastructure for the solver algorithm:
   '''
 
 import sys
+import numpy as np
 
 # Creates the initial game state
 class sudokuBoard:
 	def __init__(self, listRows, listCols):
 		self.rows = listRows
 		self.cols = listCols
-		
-		# Generate Game Grid?
+		self.cells = None
 		self.grid = [[0 for x in range(len(self.rows))] for y in range(len(self.cols))]
+		
+		# Generate Game Grid
 		for i in range(len(self.rows)):
 			for j in range(len(self.rows)):
 				self.grid[i][j] = self.rows[i][j]
 		
-		# Generate Cells?
-		
-		# Might need to make this a method, and not make it into a multidimensional array. keep as list,
-		# the checking algorithm will be easier, and modifications to the gamestate made by the csp agent
-		# should use methods in this class to convert the changes into cells/rows/cols
+		# Generate Cells
 		nCell = [0 for i in range(9)]
 		nCell[0] = str(self.rows[0][:3] + self.rows[1][:3] + self.rows[2][:3])
 		nCell[1] = str(self.rows[0][3:6] + self.rows[1][3:6] + self.rows[2][3:6])
@@ -140,6 +138,7 @@ class sudokuBoard:
 		return (self.rows, self.cols, self.grid, self.cells)
 		
 	def generateNewGrid(self):
+		# Uses rows to construct a new NxN game grid
 		for i in range(len(self.rows)):
 			for j in range(len(self.rows)):
 				self.grid[i][j] = self.rows[i][j]
@@ -169,7 +168,9 @@ class sudokuBoard:
 				self.rows[x][y] = value
 		for j in range(len(self.cols[y])):
 			if j == x:
-				self.cols[x]
+				self.cols[x][y] = value
+				
+		generateNewNCells()
 		
 # Performs all actions on the game state.				
 class agentCSP:
@@ -183,7 +184,7 @@ class agentCSP:
 	def isBoardFull(self):
 		for i in range(len(self.gameState)):
 			for j in range(len(self.gameState)):
-				if self.gameState[i][j] == 0:
+				if self.gameState[i][j] == '0':
 					return False
 		return True
 		
@@ -192,20 +193,20 @@ class agentCSP:
 		if isBoardFull(game):
 			#Check Rows
 			for i in range(len(self.rows)):
-				setRow = set(self.rows[i])
-				checkRow = list(setRow)
+				#setRow = set(self.rows[i])
+				checkRow = list(set(self.rows[i]))
 				if len(checkRow) != 9:
 					return False
 			#Check Columns
 			for j in range(len(self.cols)):
-				setCol = set(self.cols[j])
-				checkCol = list(setCol)
+				#setCol = set(self.cols[j])
+				checkCol = list(set(self.cols[j]))
 				if len(checkCol) != 9:
 					return False
 			#Check Cells - NYI
 			for k in range(len(self.cells)):
-				setCell = set(self.cells[k])
-				checkCell = list(setCell)
+				#setCell = set(self.cells[k])
+				checkCell = list(set(self.cells[k]))
 				if len(checkCell) != 9:
 					return False
 		else:
@@ -213,9 +214,18 @@ class agentCSP:
 		
 		return True
 		
+	def getDomain(self, entry):
+		# Takes in a single row, column, or cell as a parameter (called entry)
+		# Forward Checking, gets domain of row or column
+		U = {1,2,3,4,5,6,7,8,9}
+		R_temp = []
+		for i in range(len(entry)):
+			if entry[i] != '0':
+				R.append(entry[i])		
+				
+		domain = list(U - set(R_temp))
 		
-		
-	
+		return domain
 		
 		
 
@@ -246,25 +256,8 @@ def loadBoard(filename):
 			tempColumn.append(row[k][j])
 		column.append(tempColumn)
 		
-	# Do N Cells need to be constructed?
-	# Fuck it, don't forget to remove this comment
-	# Cells are created by rows, not columns.
-	'''
-	nCell = [0 for i in range(9)]
-	nCell[0] = [row[0][:3], row[1][:3], row[2][:3]]
-	nCell[1] = [row[0][3:6], row[1][3:6], row[2][3:6]]
-	nCell[2] = [row[0][6:], row[1][6:], row[2][6:]]
-
-	nCell[3] = [row[3][:3], row[4][:3], row[5][:3]]
-	nCell[4] = [row[3][3:6], row[4][3:6], row[5][3:6]]
-	nCell[5] = [row[3][6:], row[4][6:], row[5][6:]]
-
-	nCell[6] = [row[6][:3], row[7][:3], row[8][:3]]
-	nCell[7] = [row[6][3:6], row[7][3:6], row[8][3:6]]
-	nCell[8] = [row[6][6:], row[7][6:], row[8][6:]]
+	file.close()
 	
-	return (row, column, nCells)
-	'''
 	return (row, column)
 	
 def CSP(x, y):
