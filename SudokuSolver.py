@@ -132,7 +132,30 @@ class sudokuBoard:
 		return self.grid
 		
 	def getCells(self):
-		return self.cells
+		return self.cells				
+	
+	def getCellFromPos(self, r, c):
+		if (r <= 2 and r >= 0):	#First row of cells
+			if c <= 2 and c >= 0):
+				return nCell[0]
+			elif (c <= 5 and c >= 3):
+				return nCell[1]
+			elif (c <= 8 and c >= 6):
+				return nCell[2]
+		elif (r <= 5 and r >= 3):
+			if c <= 2 and c >= 0):
+				return nCell[3]
+			elif (c <= 5 and c >= 3):
+				return nCell[4]
+			elif (c <= 8 and c >= 6):
+				return nCell[5]
+		elif (r <= 8 and r >= 6):
+			if c <= 2 and c >= 0):
+				return nCell[6]
+			elif (c <= 5 and c >= 3):
+				return nCell[7]
+			elif (c <= 8 and c >= 6):
+				return nCell[8]
 	
 	def getGameState(self):
 		return (self.rows, self.cols, self.grid, self.cells)
@@ -159,7 +182,7 @@ class sudokuBoard:
 				
 		self.cells = nCell
 	
-	def setNewGridValue(self, x, y, value)
+	def setNewGridValue(self, x, y, value):
 		self.grid[x][y] = value
 		
 		#Re-evaluate the rows and columns
@@ -168,9 +191,9 @@ class sudokuBoard:
 				self.rows[x][y] = value
 		for j in range(len(self.cols[y])):
 			if j == x:
-				self.cols[x][y] = value
+				self.cols[y][x] = value
 				
-		generateNewNCells()
+		self.generateNewNCells()
 		
 # Performs all actions on the game state.				
 class agentCSP:
@@ -214,19 +237,88 @@ class agentCSP:
 		
 		return True
 		
-	def getDomain(self, entry):
+	def getDomainHelper(self, entry):
 		# Takes in a single row, column, or cell as a parameter (called entry)
 		# Forward Checking, gets domain of row or column
-		U = {1,2,3,4,5,6,7,8,9}
+		U = {'1','2','3','4','5','6','7','8','9'}
 		R_temp = []
 		for i in range(len(entry)):
 			if entry[i] != '0':
-				R.append(entry[i])		
+				R_temp.append(entry[i])		
 				
 		domain = list(U - set(R_temp))
 		
 		return domain
 		
+		
+		
+	def getDomain(self, x, y):
+		R_temp = []
+		C_temp = []
+		N_temp = []
+		domain = []
+		row = game.getRows()
+		column = game.getCols()
+		
+		C_temp = self.getDomainHelper(column[x])
+		R_temp = self.getDomainHelper(row[y])
+		N_temp = self.getDomainHelper(game.getCellFromPos(x,y))
+		
+		D_temp = C_temp + R_temp + N_temp
+		
+		for i in range(1,9):
+			if D_temp.count(i) == 3:
+				domain.append(i)
+				
+		return domain	
+		
+	def findNextEmptySpace(self, game):
+		rows = game.getRows()
+		space = len(rows)
+		for i in range(space):
+			for j in range(space):
+				if rows[i][j] == '0':
+					return (i,j)
+				
+		
+	def searchCSP(self, game):
+		stack = []
+		val = None
+		posX, posY = self.findNextEmptySpace()
+		lastVal = '0'
+		
+		while not (self.isGoalState(game)):
+			
+			domain = self.getDomain(posX, posY)
+			
+			if lastVal != '0':
+				domain = domain.remove(lastVal)
+			
+			if len(domain) > 0:
+				# Cast domain to ints:
+				domain_temp = []
+				for i in range(len(domain)):
+					for j in range(1,9):
+						if int(domain[i]) == j:
+							domain_temp.append(j)
+							
+				val = str(min(domain_temp))
+				
+				stack.append(val, posX, posY)
+				game.setNewGridValue(posX, posY, val)
+				
+				posX, posY = self.findNextEmptySpace()
+				lastVal = '0'
+				
+			elif len(domain) == 0:
+				
+				lastVal, lastX, lastY = stack.pop()
+				game.setNewGridValue(lastX, lastY, '0')
+				posX = lastX
+				posY = lastY
+				
+			
+		return game
 		
 
 
@@ -240,7 +332,8 @@ def loadBoard(filename):
 	
 	# Read in line by line. Each row is a list element.
 	for line in file:
-		rawBoardData.append(line)
+		if line != '\n':
+			rawBoardData.append(line)
 	
 	# Remove Header from .sdk
 	rawBoardData.pop(0)
@@ -248,8 +341,8 @@ def loadBoard(filename):
 	# Creates two lists, one containing the rows, and another containing the columns
 	row = []
 	column = []
-	for i in range(len(rawBoard)):
-		row.append(rawBoard[i].split())
+	for i in range(len(rawBoardData)):
+		row.append(rawBoardData[i].split())
 	for j in range(len(row)):
 		tempColumn = []
 		for k in range(len(row)):
@@ -257,6 +350,7 @@ def loadBoard(filename):
 		column.append(tempColumn)
 		
 	file.close()
+	#print(column)
 	
 	return (row, column)
 	
@@ -267,4 +361,6 @@ def CSP(x, y):
 def main():
 	x, y = loadBoard(sys.argv[1])
 	return CSP(x, y)
+
+main()
 	
