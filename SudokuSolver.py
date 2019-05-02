@@ -93,6 +93,7 @@ Infrastructure for the solver algorithm:
 import sys
 import numpy as np
 import copy
+import datetime as dt
 
 # Creates the initial game state
 class sudokuBoard:
@@ -438,7 +439,12 @@ def loadBoard(filename):
 def CSP(x, y):
 	G = sudokuBoard(x, y)
 	Q = agentCSP(G)
+	startTime = dt.datetime.now()
 	SolvedBoard = Q.searchCSP(G)
+	finishTime = dt.datetime.now()
+	
+	elapsedTime = finishTime - startTime
+	print('Time to Solve (in seconds): ' + str(elapsedTime.total_seconds()))
 	
 
 def main():
