@@ -92,6 +92,7 @@ Infrastructure for the solver algorithm:
 
 import sys
 import numpy as np
+import copy
 
 # Creates the initial game state
 class sudokuBoard:
@@ -108,17 +109,17 @@ class sudokuBoard:
 		
 		# Generate Cells
 		nCell = [0 for i in range(9)]
-		nCell[0] = str(self.rows[0][:3] + self.rows[1][:3] + self.rows[2][:3])
-		nCell[1] = str(self.rows[0][3:6] + self.rows[1][3:6] + self.rows[2][3:6])
-		nCell[2] = str(self.rows[0][6:] + self.rows[1][6:] + self.rows[2][6:])
+		nCell[0] = self.rows[0][:3] + self.rows[1][:3] + self.rows[2][:3]
+		nCell[1] = self.rows[0][3:6] + self.rows[1][3:6] + self.rows[2][3:6]
+		nCell[2] = self.rows[0][6:] + self.rows[1][6:] + self.rows[2][6:]
 
-		nCell[3] = str(self.rows[3][:3] + self.rows[4][:3] + self.rows[5][:3])
-		nCell[4] = str(self.rows[3][3:6] + self.rows[4][3:6] + self.rows[5][3:6])
-		nCell[5] = str(self.rows[3][6:] + self.rows[4][6:] + self.rows[5][6:])
+		nCell[3] = self.rows[3][:3] + self.rows[4][:3] + self.rows[5][:3]
+		nCell[4] = self.rows[3][3:6] + self.rows[4][3:6] + self.rows[5][3:6]
+		nCell[5] = self.rows[3][6:] + self.rows[4][6:] + self.rows[5][6:]
 
-		nCell[6] = str(self.rows[6][:3] + self.rows[7][:3] + self.rows[8][:3])
-		nCell[7] = str(self.rows[6][3:6] + self.rows[7][3:6] + self.rows[8][3:6])
-		nCell[8] = str(self.rows[6][6:] + self.rows[7][6:] + self.rows[8][6:])
+		nCell[6] = self.rows[6][:3] + self.rows[7][:3] + self.rows[8][:3]
+		nCell[7] = self.rows[6][3:6] + self.rows[7][3:6] + self.rows[8][3:6]
+		nCell[8] = self.rows[6][6:] + self.rows[7][6:] + self.rows[8][6:]
 				
 		self.cells = nCell
 			
@@ -136,26 +137,26 @@ class sudokuBoard:
 	
 	def getCellFromPos(self, r, c):
 		if (r <= 2 and r >= 0):	#First row of cells
-			if c <= 2 and c >= 0):
-				return nCell[0]
+			if (c <= 2 and c >= 0):
+				return self.cells[0]
 			elif (c <= 5 and c >= 3):
-				return nCell[1]
+				return self.cells[1]
 			elif (c <= 8 and c >= 6):
-				return nCell[2]
+				return self.cells[2]
 		elif (r <= 5 and r >= 3):
-			if c <= 2 and c >= 0):
-				return nCell[3]
+			if (c <= 2 and c >= 0):
+				return self.cells[3]
 			elif (c <= 5 and c >= 3):
-				return nCell[4]
+				return self.cells[4]
 			elif (c <= 8 and c >= 6):
-				return nCell[5]
+				return self.cells[5]
 		elif (r <= 8 and r >= 6):
-			if c <= 2 and c >= 0):
-				return nCell[6]
+			if (c <= 2 and c >= 0):
+				return self.cells[6]
 			elif (c <= 5 and c >= 3):
-				return nCell[7]
+				return self.cells[7]
 			elif (c <= 8 and c >= 6):
-				return nCell[8]
+				return self.cells[8]
 	
 	def getGameState(self):
 		return (self.rows, self.cols, self.grid, self.cells)
@@ -168,17 +169,17 @@ class sudokuBoard:
 
 	def generateNewNCells(self):
 		nCell = [0 for i in range(9)]
-		nCell[0] = str(self.rows[0][:3] + self.rows[1][:3] + self.rows[2][:3])
-		nCell[1] = str(self.rows[0][3:6] + self.rows[1][3:6] + self.rows[2][3:6])
-		nCell[2] = str(self.rows[0][6:] + self.rows[1][6:] + self.rows[2][6:])
+		nCell[0] = self.rows[0][:3] + self.rows[1][:3] + self.rows[2][:3]
+		nCell[1] = self.rows[0][3:6] + self.rows[1][3:6] + self.rows[2][3:6]
+		nCell[2] = self.rows[0][6:] + self.rows[1][6:] + self.rows[2][6:]
 
-		nCell[3] = str(self.rows[3][:3] + self.rows[4][:3] + self.rows[5][:3])
-		nCell[4] = str(self.rows[3][3:6] + self.rows[4][3:6] + self.rows[5][3:6])
-		nCell[5] = str(self.rows[3][6:] + self.rows[4][6:] + self.rows[5][6:])
+		nCell[3] = self.rows[3][:3] + self.rows[4][:3] + self.rows[5][:3]
+		nCell[4] = self.rows[3][3:6] + self.rows[4][3:6] + self.rows[5][3:6]
+		nCell[5] = self.rows[3][6:] + self.rows[4][6:] + self.rows[5][6:]
 
-		nCell[6] = str(self.rows[6][:3] + self.rows[7][:3] + self.rows[8][:3])
-		nCell[7] = str(self.rows[6][3:6] + self.rows[7][3:6] + self.rows[8][3:6])
-		nCell[8] = str(self.rows[6][6:] + self.rows[7][6:] + self.rows[8][6:])
+		nCell[6] = self.rows[6][:3] + self.rows[7][:3] + self.rows[8][:3]
+		nCell[7] = self.rows[6][3:6] + self.rows[7][3:6] + self.rows[8][3:6]
+		nCell[8] = self.rows[6][6:] + self.rows[7][6:] + self.rows[8][6:]
 				
 		self.cells = nCell
 	
@@ -194,6 +195,8 @@ class sudokuBoard:
 				self.cols[y][x] = value
 				
 		self.generateNewNCells()
+	
+	
 		
 # Performs all actions on the game state.				
 class agentCSP:
@@ -204,34 +207,43 @@ class agentCSP:
 		self.gameState = game.getGameState()
 		
 		
-	def isBoardFull(self):
-		for i in range(len(self.gameState)):
-			for j in range(len(self.gameState)):
-				if self.gameState[i][j] == '0':
+	def isBoardFull(self, game):
+		for i in range(len(game.getGameState())):
+			for j in range(len(game.getGameState())):
+				test = game.getGameState()
+				if test[i][j] == '0':
 					return False
 		return True
 		
 	def isGoalState(self, game):
 		# Check if board is filled
-		if isBoardFull(game):
+		cells = game.getCells()
+		if self.isBoardFull(game):
 			#Check Rows
-			for i in range(len(self.rows)):
+			for i in range(len(game.rows)):
 				#setRow = set(self.rows[i])
-				checkRow = list(set(self.rows[i]))
-				if len(checkRow) != 9:
+				checkRow = list(set(game.rows[i]))
+				if (len(checkRow) != 9) or ('0' in checkRow):
+					#print(checkRow)
+					#print(len(checkRow))
 					return False
 			#Check Columns
-			for j in range(len(self.cols)):
+			for j in range(len(game.cols)):
 				#setCol = set(self.cols[j])
-				checkCol = list(set(self.cols[j]))
-				if len(checkCol) != 9:
+				checkCol = list(set(game.cols[j]))
+				if (len(checkCol) != 9) or ('0' in checkCol):
+					#print(checkCol)
+					#print(len(checkCol))
 					return False
-			#Check Cells - NYI
-			for k in range(len(self.cells)):
+			#Check Cells
+			for k in range(len(cells)):
 				#setCell = set(self.cells[k])
-				checkCell = list(set(self.cells[k]))
-				if len(checkCell) != 9:
+				setCell = set(cells[k])
+				checkCell = list(setCell)
+				if (len(checkCell) != 9) or ('0' in checkCell):
+					#print(len(checkCell))
 					return False
+			
 		else:
 			return False
 		
@@ -252,24 +264,31 @@ class agentCSP:
 		
 		
 		
-	def getDomain(self, x, y):
+	def getDomain(self, x, y, game):
 		R_temp = []
 		C_temp = []
 		N_temp = []
 		domain = []
 		row = game.getRows()
+		#print(row[x])
 		column = game.getCols()
+		#print(column[y])
 		
-		C_temp = self.getDomainHelper(column[x])
-		R_temp = self.getDomainHelper(row[y])
+		C_temp = self.getDomainHelper(column[y])
+		R_temp = self.getDomainHelper(row[x])
 		N_temp = self.getDomainHelper(game.getCellFromPos(x,y))
+		#print(C_temp)
+		#print(R_temp)
+		#print(N_temp)
 		
 		D_temp = C_temp + R_temp + N_temp
+		#print(D_temp)
 		
-		for i in range(1,9):
-			if D_temp.count(i) == 3:
-				domain.append(i)
-				
+		for i in range(1,10):
+			if D_temp.count(str(i)) == 3:
+				domain.append(str(i))
+		
+		#print(domain)		
 		return domain	
 		
 	def findNextEmptySpace(self, game):
@@ -280,39 +299,82 @@ class agentCSP:
 				if rows[i][j] == '0':
 					return (i,j)
 				
-		
+	def findMostConstrainedSpace(self, game):
+		rows = game.getRows()
+		space = len(rows)
+		for i in range(space):
+			for j in range(space):
+				if (len(self.getDomain(i,j,game)) == 1) and (rows[i][j] == '0'):
+					return (i,j)
+	
+	def printBoard(self, game):
+		rows = game.getRows()
+		for i in range(len(rows)):
+			print(rows[i])
+	
+	def searchCSP(self, game):
+		while not (self.isGoalState(game)):
+			posX, posY = self.findMostConstrainedSpace(game)
+			val = self.getDomain(posX, posY, game)
+			game.setNewGridValue(posX, posY, val[0])
+			
+		self.printBoard(game)
+		return game
+				
+	
+	
+	'''
 	def searchCSP(self, game):
 		stack = []
 		val = None
-		posX, posY = self.findNextEmptySpace()
+		posX, posY = self.findNextEmptySpace(game)
+		initialX, initialY = (posX, posY)
+		#print(game.getGrid())
+		#print(posX, posY)
 		lastVal = '0'
 		
 		while not (self.isGoalState(game)):
+			print('searchCSP loop iteration')
 			
-			domain = self.getDomain(posX, posY)
+			domain = self.getDomain(posX, posY, game)
+			print(domain)
 			
 			if lastVal != '0':
-				domain = domain.remove(lastVal)
+				print('lastVal:')
+				print(lastVal)
+				if len(domain) > 1:
+					#domain = domain.remove(lastVal)
+					domain = lastDom.remove(lastVal)
+				else:
+					domain = []
+					
 			
 			if len(domain) > 0:
 				# Cast domain to ints:
 				domain_temp = []
 				for i in range(len(domain)):
-					for j in range(1,9):
+					for j in range(1,10):
 						if int(domain[i]) == j:
 							domain_temp.append(j)
 							
 				val = str(min(domain_temp))
 				
-				stack.append(val, posX, posY)
+				stack.append((val, posX, posY, domain))
+				print('Appending ' + val + ' to stack')
+				#stack.append((val, posX, posY))
 				game.setNewGridValue(posX, posY, val)
 				
-				posX, posY = self.findNextEmptySpace()
+				posX, posY = self.findNextEmptySpace(game)
 				lastVal = '0'
 				
 			elif len(domain) == 0:
 				
-				lastVal, lastX, lastY = stack.pop()
+				if len(stack) > 0:
+					print(stack[-1])
+				else:
+					print('Empty Stack')
+				lastVal, lastX, lastY, lastDom = stack.pop()
+				#lastVal, lastX, lastY = stack.pop()
 				game.setNewGridValue(lastX, lastY, '0')
 				posX = lastX
 				posY = lastY
@@ -320,6 +382,25 @@ class agentCSP:
 			
 		return game
 		
+		
+	def test_CSP(self, game):
+		if self.isGoalState(game) == True:
+			return (True, game)
+		
+		posX, posY = self.findNextEmptySpace(game)
+		
+		for i in range(1,10):
+			if i in self.getDomain(posX, posY, game):
+				game.setNewGridValue(posX, posY, str(i))
+				g2 = game.copy.deepcopy(game)
+				
+				if test_CSP(self, g2)[0] == True:
+					return (True, game)
+				
+				game.setNewGridValue(posX, posY, '0')
+		
+		return False
+		'''
 
 
 
@@ -357,6 +438,8 @@ def loadBoard(filename):
 def CSP(x, y):
 	G = sudokuBoard(x, y)
 	Q = agentCSP(G)
+	SolvedBoard = Q.searchCSP(G)
+	
 
 def main():
 	x, y = loadBoard(sys.argv[1])
