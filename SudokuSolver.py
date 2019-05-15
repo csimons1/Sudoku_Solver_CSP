@@ -222,29 +222,20 @@ class agentCSP:
 		if self.isBoardFull(game):
 			#Check Rows
 			for i in range(len(game.rows)):
-				#setRow = set(self.rows[i])
 				checkRow = list(set(game.rows[i]))
 				if (len(checkRow) != 9) or ('0' in checkRow):
-					#print(checkRow)
-					#print(len(checkRow))
 					return False
 			#Check Columns
 			for j in range(len(game.cols)):
-				#setCol = set(self.cols[j])
 				checkCol = list(set(game.cols[j]))
 				if (len(checkCol) != 9) or ('0' in checkCol):
-					#print(checkCol)
-					#print(len(checkCol))
 					return False
 			#Check Cells
 			for k in range(len(cells)):
-				#setCell = set(self.cells[k])
 				setCell = set(cells[k])
 				checkCell = list(setCell)
 				if (len(checkCell) != 9) or ('0' in checkCell):
-					#print(len(checkCell))
-					return False
-			
+					return False	
 		else:
 			return False
 		
@@ -271,25 +262,18 @@ class agentCSP:
 		N_temp = []
 		domain = []
 		row = game.getRows()
-		#print(row[x])
 		column = game.getCols()
-		#print(column[y])
 		
 		C_temp = self.getDomainHelper(column[y])
 		R_temp = self.getDomainHelper(row[x])
 		N_temp = self.getDomainHelper(game.getCellFromPos(x,y))
-		#print(C_temp)
-		#print(R_temp)
-		#print(N_temp)
 		
 		D_temp = C_temp + R_temp + N_temp
-		#print(D_temp)
 		
 		for i in range(1,10):
 			if D_temp.count(str(i)) == 3:
 				domain.append(str(i))
-		
-		#print(domain)		
+				
 		return domain	
 		
 	def findNextEmptySpace(self, game):
@@ -307,6 +291,9 @@ class agentCSP:
 			for j in range(space):
 				if (len(self.getDomain(i,j,game)) == 1) and (rows[i][j] == '0'):
 					return (i,j)
+					
+		#If no space found
+		return (False, False)
 	
 	def printBoard(self, game):
 		rows = game.getRows()
@@ -314,96 +301,18 @@ class agentCSP:
 			print(rows[i])
 	
 	def searchCSP(self, game):
+		solvable = True
 		while not (self.isGoalState(game)):
 			posX, posY = self.findMostConstrainedSpace(game)
+			if (posX == False) or (posY == False):
+				solvable = False
+			else:
+				solvable = True
 			val = self.getDomain(posX, posY, game)
 			game.setNewGridValue(posX, posY, val[0])
 			
 		self.printBoard(game)
-		return game
-				
-	
-	
-	'''
-	def searchCSP(self, game):
-		stack = []
-		val = None
-		posX, posY = self.findNextEmptySpace(game)
-		initialX, initialY = (posX, posY)
-		#print(game.getGrid())
-		#print(posX, posY)
-		lastVal = '0'
-		
-		while not (self.isGoalState(game)):
-			print('searchCSP loop iteration')
-			
-			domain = self.getDomain(posX, posY, game)
-			print(domain)
-			
-			if lastVal != '0':
-				print('lastVal:')
-				print(lastVal)
-				if len(domain) > 1:
-					#domain = domain.remove(lastVal)
-					domain = lastDom.remove(lastVal)
-				else:
-					domain = []
-					
-			
-			if len(domain) > 0:
-				# Cast domain to ints:
-				domain_temp = []
-				for i in range(len(domain)):
-					for j in range(1,10):
-						if int(domain[i]) == j:
-							domain_temp.append(j)
-							
-				val = str(min(domain_temp))
-				
-				stack.append((val, posX, posY, domain))
-				print('Appending ' + val + ' to stack')
-				#stack.append((val, posX, posY))
-				game.setNewGridValue(posX, posY, val)
-				
-				posX, posY = self.findNextEmptySpace(game)
-				lastVal = '0'
-				
-			elif len(domain) == 0:
-				
-				if len(stack) > 0:
-					print(stack[-1])
-				else:
-					print('Empty Stack')
-				lastVal, lastX, lastY, lastDom = stack.pop()
-				#lastVal, lastX, lastY = stack.pop()
-				game.setNewGridValue(lastX, lastY, '0')
-				posX = lastX
-				posY = lastY
-				
-			
-		return game
-		
-		
-	def test_CSP(self, game):
-		if self.isGoalState(game) == True:
-			return (True, game)
-		
-		posX, posY = self.findNextEmptySpace(game)
-		
-		for i in range(1,10):
-			if i in self.getDomain(posX, posY, game):
-				game.setNewGridValue(posX, posY, str(i))
-				g2 = game.copy.deepcopy(game)
-				
-				if test_CSP(self, g2)[0] == True:
-					return (True, game)
-				
-				game.setNewGridValue(posX, posY, '0')
-		
-		return False
-		'''
-
-
+		return (game, solvable)
 
 
 # loadBoard reads in a .sdk file of a sudoku board, parses it
@@ -444,7 +353,11 @@ def CSP(x, y):
 	finishTime = dt.datetime.now()
 	
 	elapsedTime = finishTime - startTime
-	print('Time to Solve (in seconds): ' + str(elapsedTime.total_seconds()))
+	
+	if SolvedBoard[1] == False:
+		print("Board is unsolvable")
+	else:
+		print('Time to Solve (in seconds): ' + str(elapsedTime.total_seconds()))
 	
 
 def main():
